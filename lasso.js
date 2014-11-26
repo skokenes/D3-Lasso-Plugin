@@ -6,14 +6,13 @@ d3.lasso = function() {
 		isPathClosed = false,
 		hoverSelect = true,
 		points = [],
-		clipPath = '',
+		area = null,
 		on = {start:function(){}, draw: function(){}, end: function(){}};
 
 	function lasso() {
 		var _this = d3.select(this[0][0]);
 		var g = _this.append("g")
-					.attr("class","lasso")
-					.attr("clip-path","url(" + clipPath + ")");
+					.attr("class","lasso");
 		var dyn_path = g.append("path")
 			.attr("class","drawn");
 		var close_path = g.append("path")
@@ -24,12 +23,13 @@ d3.lasso = function() {
 			.attr("class","origin");
 		var path;
 		var origin;
+		var last_known_point;
 		var path_length_start;
 		var drag = d3.behavior.drag()
 			.on("dragstart",dragstart)
 			.on("drag",dragmove)
 			.on("dragend",dragend);
-		_this.call(drag);
+		area.call(drag);
 
 		function dragstart() {
 			// Reset blank lasso path
@@ -64,19 +64,21 @@ d3.lasso = function() {
 		}
 
 		function dragmove() {
+			var x = d3.mouse(this)[0]; 
+			var y = d3.mouse(this)[1]; 
 			// Initialize the path or add the latest point to it
 			if (path=="") {
-				path = path + "M " + d3.event.x + " " + d3.event.y;
-				origin = [d3.event.x,d3.event.y];
+				path = path + "M " + x + " " + y;
+				origin = [x,y];
 				// Draw origin node
 				origin_node
-					.attr("cx",d3.event.x)
-					.attr("cy",d3.event.y)
+					.attr("cx",x)
+					.attr("cy",y)
 					.attr("r",7)
 					.attr("display",null);
 			}
 			else {
-				path = path + " L " + d3.event.x + " " + d3.event.y;
+				path = path + " L " + x + " " + y;
 			}
 
 			// Reset closed edges counter
@@ -85,10 +87,10 @@ d3.lasso = function() {
 			});
 
 			// Calculate the current distance from the lasso origin
-			var distance = Math.sqrt(Math.pow(d3.event.x-origin[0],2)+Math.pow(d3.event.y-origin[1],2));
+			var distance = Math.sqrt(Math.pow(x-origin[0],2)+Math.pow(y-origin[1],2));
 
 			// Set the closed path line
-			var close_draw_path = "M " + d3.event.x + " " + d3.event.y + " L " + origin[0] + " " + origin[1];
+			var close_draw_path = "M " + x + " " + y + " L " + origin[0] + " " + origin[1];
 
 			// Draw the lines
 			dyn_path.attr("d",path);
@@ -104,7 +106,6 @@ d3.lasso = function() {
 
 			isPathClosed = distance<=closePathDistance ? true : false;
 
-
 	  		// create complete path
 	  		var complete_path_d = d3.select("path")[0][0].attributes.d.value + "Z";
 	  		complete_path.attr("d",complete_path_d);
@@ -113,10 +114,6 @@ d3.lasso = function() {
 			var path_node = dyn_path.node();
 		  	var path_length_end = path_node.getTotalLength();
 		  	var last_pos = path_node.getPointAtLength(path_length_start-1);
-		  	var last_known_point = {
-	  						x: last_pos.x,
-	  						y: last_pos.y
-	  					};
 		  
 		  	for (var i = path_length_start; i<=path_length_end; i++) {
 		  		var cur_pos = path_node.getPointAtLength(i);
@@ -146,6 +143,10 @@ d3.lasso = function() {
 		  				a = sign(d.lassoPoint.cy-cur_pos_obj.y)!=sign(d.lassoPoint.cy-last_known_point.y);
 		  			}
 		  			else {
+		  				last_known_point = {
+	  						x: prior_pos_obj.x,
+	  						y: prior_pos_obj.y
+	  					};
 		  				a = sign(d.lassoPoint.cy-cur_pos_obj.y)!=sign(d.lassoPoint.cy-prior_pos_obj.y);
 		  			} 
 		  			return a;
@@ -273,12 +274,6 @@ d3.lasso = function() {
     	return lasso;
 	};
 
-	lasso.clipPath = function(_) {
-		if (!arguments.length) return clipPath;
-    	clipPath = _;
-    	return lasso;
-	};
-
 	lasso.on = function(type,_) {
 		if(!arguments.length) return on;
 		if(arguments.length===1) return on[type];
@@ -286,6 +281,12 @@ d3.lasso = function() {
 		if(types.indexOf(type)>-1) {
 			on[type] = _;
 		};
+		return lasso;
+	}
+
+	lasso.area = function(_) {
+		if(!arguments.length) return area;
+		area=_;
 		return lasso;
 	}
 

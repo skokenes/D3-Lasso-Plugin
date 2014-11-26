@@ -52,11 +52,11 @@ The closePathDistance() parameter takes in a number that specifies the maximum d
 lasso.closePathDistance(75); // the lasso loop will complete itself whenever the lasso end is within 75 pixels of the origin
 ```
 
-lasso.**clipPath**(_[id]_)
+lasso.**area**(_[sel]_)
 
-The clipPath() parameter takes in a string representing the id of an element to be used as a clipPath for the lasso. By default, no clipPath is defined. If no input is specified, the function returns the current clipPath id.
+The area() parameter takes in a selection representing the element to be used as a target area for the lasso event. If no input is specified, the function returns the current area selection.
 ```
-lasso.clipPath("#clip"); // the lasso will be clipped by the element with id "#clip"
+lasso.area(d3.select("#myLassoRect")); // the lasso will be trigger whenever a user clicks and drags on #myLassoRect
 ```
 
 lasso.**on**(_type,[func]_)
@@ -76,6 +76,9 @@ Initiating a lasso
 Once a lasso object is defined, it can be added to a page by calling it on an element like an svg.
 ```
 var lasso = d3.lasso()
-                .items(d3.selectAll("circle")); // Create a lasso and provide it some target elements
+                .items(d3.selectAll("circle")) // Create a lasso and provide it some target elements
+                .area(de.select("#myLassoRect")); // Sets the drag area for the lasso on the rectangle #myLassoRect
 d3.select("svg").call(lasso); // Initiate the lasso on an svg element
 ```
+
+If a lasso is going to be used on graphical elements that have been translated via a g element acting as a container, which is a common practice for incorporating chart margins, then the lasso should be called on that g element so that it is in the same coordinate system as the graphical elements.
