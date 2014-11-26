@@ -3,6 +3,10 @@ lasso
 
 lasso.js is a D3 plugin that allows you to tag elements on a page by drawing a line over or around objects. Functions can be run based on the lasso action. This functionality can be useful for brushing or filtering.
 
+An example of the lasso implemented in a scatterplot can be found here: [http://bl.ocks.org/skokenes/511c5b658c405ad68941](http://bl.ocks.org/skokenes/511c5b658c405ad68941)
+
+This example is based off of Mike Bostock's scatterplot example here: [http://bl.ocks.org/mbostock/3887118](http://bl.ocks.org/mbostock/3887118)
+
 Lassoing tags
 --
 When the lasso is used, it tags elements by adding properties to their data. The properties are:
