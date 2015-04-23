@@ -38,14 +38,16 @@ d3.lasso = function() {
 			close_path.attr("d",null);
 			// Set path length start
 			path_length_start = 0;
+			var offset_box = _this[0][0].getBoundingClientRect();
 			// Set every item to have a false selection and reset their center point and counters
 			items[0].forEach(function(d) {
 				d.hoverSelected = false;
 				d.loopSelected = false;
 				var cur_box = d.getBBox();
+				var new_box = d.getBoundingClientRect();
 			  	d.lassoPoint = {
-			  		cx: Math.round(cur_box.x + cur_box.width/2),
-					cy: Math.round(cur_box.y + cur_box.height/2),
+					cx: Math.round(new_box.left-offset_box.left + new_box.width/2),
+					cy: Math.round(new_box.top-offset_box.top + new_box.height/2),
 					edges: {top:0,right:0,bottom:0,left:0},
 					close_edges: {left: 0, right: 0}
 			  	};
@@ -107,7 +109,7 @@ d3.lasso = function() {
 			isPathClosed = distance<=closePathDistance ? true : false;
 
 	  		// create complete path
-	  		var complete_path_d = d3.select("path")[0][0].attributes.d.value + "Z";
+	  		var complete_path_d = path + "Z";
 	  		complete_path.attr("d",complete_path_d);
 
 			// get path length
