@@ -229,7 +229,7 @@ d3.lasso = function() {
             // If the path is closed and close select is set to true, draw the closed paths and count edges
              if(isPathClosed === true && closePathSelect === true) {
                 close_path.attr("d",close_draw_path);
-                close_path_node =calc_close_path.node();
+                var close_path_node =calc_close_path.node();
                 var close_path_length = close_path_node.getTotalLength();
                 var close_path_edges = {left:0,right:0};
                 for (var i = 0; i<=close_path_length; i++) {
